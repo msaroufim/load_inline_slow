@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 import shutil
 import tempfile
+from line_profiler import profile
 
 # Find CUDA in conda environment
 conda_prefix = os.environ.get('CONDA_PREFIX')
@@ -28,15 +29,20 @@ torch::Tensor to_gray(torch::Tensor input) {
 """
 
 # Avoid caching results
-with tempfile.TemporaryDirectory() as build_dir:
-    cuda_module = load_inline(
-        name="to_gray_cuda",
-        cpp_sources=cpp_code, 
-        cuda_sources=cuda_kernel_code, 
-        functions=["to_gray"],
-        with_cuda=True,
-        verbose=True,
-        extra_cflags=["-std=c++17"], # "-ftime-report", "-H"],
-        extra_cuda_cflags=["-arch=sm_89"],
-        build_directory=build_dir,
-    )
+@profile
+def main():
+    with tempfile.TemporaryDirectory() as build_dir:
+        cuda_module = load_inline(
+            name="to_gray_cuda",
+            cpp_sources=cpp_code, 
+            cuda_sources=cuda_kernel_code, 
+            functions=["to_gray"],
+            with_cuda=True,
+            verbose=True,
+            extra_cflags=["-std=c++17"], # "-ftime-report", "-H"],
+            extra_cuda_cflags=["-arch=sm_89"],
+            build_directory=build_dir,
+        )
+
+if __name__ == "__main__":
+    main()

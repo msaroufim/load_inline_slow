@@ -1,9 +1,16 @@
 import os
-os.environ["TORCH_CUDA_ARCH_LIST"] = "8.9"
-import sys
+import cProfile
+import pstats
 from pathlib import Path
 import shutil
 import tempfile
+
+# Start the profiler
+profiler = cProfile.Profile()
+profiler.enable()
+
+# Your existing code
+os.environ["TORCH_CUDA_ARCH_LIST"] = "8.9"
 
 # Find CUDA in conda environment
 conda_prefix = os.environ.get('CONDA_PREFIX')
@@ -36,7 +43,15 @@ with tempfile.TemporaryDirectory() as build_dir:
         functions=["to_gray"],
         with_cuda=True,
         verbose=True,
-        extra_cflags=["-std=c++17"], # "-ftime-report", "-H"],
+        extra_cflags=["-std=c++17"],
         extra_cuda_cflags=["-arch=sm_89"],
         build_directory=build_dir,
     )
+
+# Stop the profiler
+profiler.disable()
+
+# Output profiling results
+stats = pstats.Stats(profiler)
+stats.sort_stats('cumulative')  # Sort by cumulative time
+stats.print_stats()  # Print stats to the console
