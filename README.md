@@ -1,14 +1,13 @@
 ## Analysis
-1. `benchmark_load_inline.py` is the basic benchmark script. Most of the user time is in template instantiation and parsing 
-2. header-analysis shows all the headers that get pulled in - about 90% of the files are torch specific and not python or linux
-3. iwyu analysis shows that minimal inclues can be faster than default includes
+1. `benchmark_load_inline.py` is the basic benchmark script. Most of the user time is in template instantiation and parsing - about 40s if we include torch headers but drops to 1s with just cuda headers (inspect the built logs https://github.com/msaroufim/load_inline_slow/tree/main/torch_extension_build)
+2. header-analysis shows all the headers that get pulled in - about 90% of the files are torch specific and not python or linux. There's about 4700/5200 files that get pulled in all torch specific
+3. iwyu analysis shows that minimal inclues can be faster than default includes (this didn't work too well but is on the right track to figure out what are the right minimal set of dependencies)
 4. cprofile-analysis shows output of profile with cprofile - a lot of file reading and path resolution and initializing pytorch 529 lines with general file-related keywords, 176 Python file operation references, 232 importlib references
-
 5. line profiler not helpful
 
 ## Description of the problem
 
-We want a way to mix in cuda code in a pytorch program in a way that takes less than 5s
+We want a way to mix in cuda code in a pytorch program in a way that takes less than 5s. Right now the leaderboard takes 5s to provision a machine and run a triton kernel wheras building a toy cuda kernel takes 40-60s.
 
 Solution space is
 1. Make people build a python package for a specific cuda version elsewhere and then pull it
@@ -16,6 +15,11 @@ Solution space is
 3. We make load inline only get what it needs and do whatever refactoring we need in aten
 4. We make a load inline fast that just c pointer a la deepseek or bnb 
 
+## Plan for what to do next
+1. Build a no-headers mode for load_inline
+2. Build tribal knowledge around which headers are mostly needed for the leaderboard (most likely we just need to keep exception.h, basetensor which a tensor without methods
+3. Do the complete exit hatch a la deepseek or bnb with c pointers if 2 is not possible
+4. Think harder about how to restructure aten with minimal baseline dependencies (needs work)
 
 ## Things to look into next
 1. Are we doing something dumb in python or c++?
