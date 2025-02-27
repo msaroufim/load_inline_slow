@@ -17,9 +17,10 @@ Solution space is
 
 ## Plan for what to do next
 1. Build a no-headers mode for load_inline
-2. Build tribal knowledge around which headers are mostly needed for the leaderboard (most likely we just need to keep exception.h, basetensor which a tensor without methods
-3. Do the complete exit hatch a la deepseek or bnb with c pointers if 2 is not possible https://github.com/deepseek-ai/DeepGEMM/blob/main/deep_gemm/jit/template.py
-4. Think harder about how to restructure aten with minimal baseline dependencies (needs work)
+2. Build tribal knowledge around which headers are mostly needed for the leaderboard (most likely we just need to keep exception.h, basetensor which a tensor without methods (Alban's idea)
+3. Use Shim.h and TensorHandle instead which is similar to the exit hatch from deepseek but a bit cleaner https://github.com/pytorch/pytorch/blob/main/torch/_inductor/codecache.py#L2161C1-L2162C1 (Jane's idea)
+4. Do the complete exit hatch a la deepseek or bnb with c pointers if 2 is not possible https://github.com/deepseek-ai/DeepGEMM/blob/main/deep_gemm/jit/template.py (Driss' idea)
+5. Think harder about how to restructure aten with minimal baseline dependencies (needs work)
 
 ## Things to look into next
 1. Are we doing something dumb in python or c++?
