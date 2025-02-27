@@ -19,7 +19,7 @@ Solution space is
 
 ## Things to look into next
 1. Are we doing something dumb in python or c++?
-2. 
+2. Including `TensorBase.h` and that will pull in close to nothing https://github.com/pytorch/pytorch/blob/main/aten/src/ATen/core/TensorBase.h and we can just share an example assuming people aren't using aten ops
 
 
 ## Profiling tools that might be helpful
