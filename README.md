@@ -8,6 +8,13 @@
 
 ## Description of the problem
 
+We want a way to mix in cuda code in a pytorch program in a way that takes less than 5s
+
+Solution space is
+1. Make people build a python package for a specific cuda version elsewhere and then pull it
+2. We build those python packages for people
+3. We make load inline only get what it needs and do whatever refactoring we need in aten
+4. We make a load inline fast that just c pointer a la deepseek or bnb 
 
 
 
