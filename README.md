@@ -1,7 +1,7 @@
 ## Analysis
 1. `benchmark_load_inline.py` is the basic benchmark script. Most of the user time is in template instantiation and parsing - about 40s if we include torch headers but drops to 1s with just cuda headers (inspect the built logs https://github.com/msaroufim/load_inline_slow/tree/main/torch_extension_build, remove pytorch headers and run the ninja build scripts directly)
 2. header-analysis shows all the headers that get pulled in - about 90% of the files are torch specific and not python or linux. There's about 4700/5200 files that get pulled in all torch specific. torch_types pulls in about 17K files
-3. iwyu analysis shows that minimal inclues can be faster than default includes (this didn't work too well but is on the right track to figure out what are the right minimal set of dependencies)
+3. iwyu analysis shows that minimal inclues can be faster than default includes (this didn't work too well but is on the right track to figure out what are the right minimal set of dependencies) the issue is load_inline always pushes some base headers and does not have a no headers mode which we should definitely do
 4. cprofile-analysis shows output of profile with cprofile - a lot of file reading and path resolution and initializing pytorch 529 lines with general file-related keywords, 176 Python file operation references, 232 importlib references
 5. line profiler not helpful
 
