@@ -20,6 +20,8 @@ Solution space is
 ## Things to look into next
 1. Are we doing something dumb in python or c++?
 2. Including `TensorBase.h` and that will pull in close to nothing https://github.com/pytorch/pytorch/blob/main/aten/src/ATen/core/TensorBase.h and we can just share an example assuming people aren't using aten ops
+3. If you want torch.empty you want empty.h (these headers were built by design to be slim)
+4. Deranged file https://github.com/pytorch/pytorch/blob/main/aten/src/ATen/cpp_custom_type_hack.h
 
 
 ## Profiling tools that might be helpful
