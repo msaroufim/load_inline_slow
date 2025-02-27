@@ -17,6 +17,10 @@ Solution space is
 4. We make a load inline fast that just c pointer a la deepseek or bnb 
 
 
+## Things to look into next
+1. Are we doing something dumb in python or c++?
+2. 
+
 
 ## Profiling tools that might be helpful
 
