@@ -4,6 +4,7 @@
 3. iwyu analysis shows that minimal inclues can be faster than default includes (this didn't work too well but is on the right track to figure out what are the right minimal set of dependencies) the issue is load_inline always pushes some base headers and does not have a no headers mode which we should definitely do
 4. cprofile-analysis shows output of profile with cprofile - a lot of file reading and path resolution and initializing pytorch 529 lines with general file-related keywords, 176 Python file operation references, 232 importlib references
 5. line profiler not helpful
+6. TODO use the NVIDIA compilation profiler with https://developer.nvidia.com/blog/optimizing-compile-times-for-cuda-c/
 
 ## Description of the problem
 
@@ -40,3 +41,9 @@ Solution space is
 7. extra_cflags=["-H", "-std=c++17", "-ftime-report"]
 8. extra_cflags=["-std=c++17", "-ftemplate-backtrace-limit=0"]
 9. extra_cflags=["-ftime-trace", "-std=c++17"]
+
+## Ok next steps
+
+So we got nvcc running at a reasonable time because of https://github.com/pytorch/pytorch/pull/149480
+
+so next step is looking at tradeoffs between nvrtc and nvcc
