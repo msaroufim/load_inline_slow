@@ -4,7 +4,7 @@
 3. iwyu analysis shows that minimal inclues can be faster than default includes (this didn't work too well but is on the right track to figure out what are the right minimal set of dependencies) the issue is load_inline always pushes some base headers and does not have a no headers mode which we should definitely do
 4. cprofile-analysis shows output of profile with cprofile - a lot of file reading and path resolution and initializing pytorch 529 lines with general file-related keywords, 176 Python file operation references, 232 importlib references
 5. line profiler not helpful
-6. TODO use the NVIDIA compilation profiler with https://developer.nvidia.com/blog/optimizing-compile-times-for-cuda-c/
+6. TODO use the NVIDIA compilation profiler with https://developer.nvidia.com/blog/optimizing-compile-times-for-cuda-c/ in particular this flag `--fdevice-time-trace`
 
 ## Description of the problem
 
@@ -47,3 +47,33 @@ Solution space is
 So we got nvcc running at a reasonable time because of https://github.com/pytorch/pytorch/pull/149480
 
 so next step is looking at tradeoffs between nvrtc and nvcc
+
+https://github.com/NVIDIA/jitify A single-header C++ library for simplifying the use of CUDA Runtime Compilation (NVRTC).
+
+NVRTC expects device code only, it cannot handle host code and does not require the entire cuda toolchain because its a library which means it also can't accept arbitrary C headers. Effectively the tradeoff is the programmer must manually manage dependencies
+
+NVRTC can output PTX or CUBIN, historically it only did cubin
+
+NVCC embeds both PTX and SASS in fatbins
+
+NVRTC is in process which is why the default backend for CuPy is nvrtc
+
+Fundamentally NVCC and NVRTC are two different backend compilers https://discuss.tvm.apache.org/t/tvm-cuda-codegen-and-tensor-core-tutorial/5426
+
+nvrtc has a firt time delay when a kernel is launched, nvrtc is t hread safe
+
+Open question: How can I audit which kernels use NVCC vs NVRTC in PyTorch?
+
+Typically nvrtc expects pytorch tensors to be accessed as float* but there must be some safer way of doing this
+
+nvrtc will create PTX which you then need to load from a module which takes ina  context and the current device, use the pytorch stream to avoid wonky issues, triton presumably does the same klind of thing
+
+nvrtc has some flags to reduce compilation times. nvrtc also provides forward compatibility
+
+Search for this stuff in pytorch code
+
+```
+nvrtcCreateProgram
+nvrtcCompileProgram
+nvrtcGetPTX
+```
